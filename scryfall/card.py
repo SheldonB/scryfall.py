@@ -1,4 +1,7 @@
 import logging
+
+import requests
+
 from scryfall import client
 
 log = logging.getLogger('scryfall')
@@ -12,12 +15,19 @@ class Card:
     def test(self):
         return 1
 
+class CardClient:
+
+    CARDS_URI = client.get_base_uri() + '/cards'
+
+    def get_by_multiverse_id(self, multiverse_id):
+        uri = self.CARDS_URI + '/multiverse/' + str(multiverse_id)
+
 
 def get(**kwargs):
     """
     get returns a single card 
 
-    :param id: The
+    :param id: The Scryfall ID.
     :param multiverse_id: The Card objects multiverse ID.
     :param mtgo_id: The card objects MTGO ID.
     :param arena_id: The card objects MtG Arena ID.
@@ -35,7 +45,18 @@ def get(**kwargs):
     multiverse_id = kwargs.get('multiverse_id')
 
     if multiverse_id is not None:
-        log.debug('Getting card based on multivers id')
+        log.debug('Getting card based on multiverse id')
+        CardClient().get_by_multiverse_id(multiverse_id)
+
+    mtgo_id = kwargs.get('mtgo_id')
+
+    if mtgo_id is not None:
+        log.debug('Getting card for mtgo id')
+
+    arena_id = kwargs.get('arena_id')
+
+    if arena_id is not None:
+        log.debug('Getting card for arena id')
 
 
 def search(**kwargs):
@@ -55,6 +76,14 @@ def random():
 
 def all():
     """
-    Retrieves all Cards from Scryfall
+    Retrieves all Cards from Scryfall.
+
+    TODO: This is a paginated request, so we 
+    will need to figure out how to handle this.
+
+    A couple ideas:
+        - Allow the page number as a param.
+        - Use a generator
+        - Make it async and just return back when we have all the cards.
     """
     log.debug('Retrieving all cards from Scryfall.')
